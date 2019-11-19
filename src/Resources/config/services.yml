@@ -1,3 +1,6 @@
 services:
   InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator:
     public: true
+    arguments:
+      - '@router'
+      - '@request_stack'

@@ -19,7 +19,11 @@ class IncludeInfoWidget extends \Contao\Widget
 {
     protected $strTemplate = 'be_include';
 
-    public function generate()
+    public function generate(): void
+    {
+    }
+
+    public function parse($attributes = null): string
     {
         // Get the active record
         $activeRecord = $this->dataContainer->activeRecord;
@@ -31,18 +35,33 @@ class IncludeInfoWidget extends \Contao\Widget
         $table = $this->strTable;
 
         // Get the aggregator service
+        /** @var IncludesAggregator $aggregator */
         $aggregator = System::getContainer()->get(IncludesAggregator::class);
 
-        // Aggregate the includes
-        $includes = [];
-
-        // Determine aggregation type
-        if ('alias' === $type || 'tl_content' === $table) {
+        // Determine aggregation
+        if ('alias' === $type) {
+            $this->original = $aggregator->getContentElement((int) $activeRecord->cteAlias);
             $includes = $aggregator->getContentElementIncludes((int) $activeRecord->cteAlias);
-        } elseif ('article' === $type || 'tl_article' === $table) {
+            unset($includes[(int) $activeRecord->id]);
+            $this->includes = $includes;
+        } elseif ('article' === $type) {
+            $this->original = $aggregator->getArticle((int) $activeRecord->articleAlias);
             $includes = $aggregator->getArticleIncludes((int) $activeRecord->articleAlias);
+            unset($includes[(int) $activeRecord->id]);
+            $this->includes = $includes;
+        } elseif ('tl_content' === $table) {
+            $this->includes = $aggregator->getContentElementIncludes((int) $activeRecord->id);
+        } elseif ('tl_article' === $table) {
+            $this->includes = $aggregator->getArticleIncludes((int) $activeRecord->id);
         }
 
-        return $this->parse(['includes' => $includes]);
+        // Add CSS
+        $GLOBALS['TL_CSS'][self::class] = 'bundles/includeinfo/be_styles.css';
+
+        if (empty($this->includes) && empty($this->original)) {
+            return '';
+        }
+
+        return parent::parse($attributes);
     }
 }

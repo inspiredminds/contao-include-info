@@ -1,0 +1,37 @@
+.tl_includes {
+    line-height: normal;
+    padding: 6px;
+    background-color: #3a454d;
+    border-left: 4px solid #f47c00;
+    color: white;
+}
+
+.tl_includes a {
+    color: inherit;
+}
+
+.tl_includes a:hover {
+	color:#77AC45;
+}
+
+.tl_includes th {
+    font-weight: normal;
+	padding-right: 5px;
+	text-align: right;
+	vertical-align: baseline;
+}
+
+.tl_content .tl_includes {
+    margin: 12px -6px 8px -6px;
+}
+
+.tl_header_table .tl_includes th {
+    display: none;
+}
+
+.tl_header_table .tl_includes {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    color: inherit;
+}
