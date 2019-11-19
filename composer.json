@@ -1,0 +1,32 @@
+{
+    "name": "inspiredminds/contao-include-info",
+    "description": "Contao extension to synchronize events between different installations.",
+    "keywords": ["contao", "calendar", "event", "sync"],
+    "type": "contao-bundle",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Fritz Michael Gschwantner",
+            "homepage": "http://www.inspiredminds.at",
+            "email": "fmg@inspiredminds.at",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "office@inspiredminds.at"
+    },
+    "require": {
+        "php": ">=7.1",
+        "contao/core-bundle": "^4.4",
+        "symfony/framework-bundle": "^3.0 || ^4.0",
+        "symfony/dependency-injection": "^3.4.26 || ^4.1.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "InspiredMinds\\IncludeInfoBundle\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "InspiredMinds\\IncludeInfoBundle\\ContaoManager\\Plugin"
+    }
+}
