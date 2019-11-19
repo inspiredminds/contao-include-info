@@ -102,7 +102,7 @@ class IncludesAggregator
         return $includes;
     }
 
-    public function getArticle(int $articleId): array
+    public function getArticle(int $articleId): ?array
     {
         // Get the article
         $article = ArticleModel::findByPk($articleId);
