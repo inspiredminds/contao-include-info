@@ -12,13 +12,15 @@ declare(strict_types=1);
 
 namespace InspiredMinds\IncludeInfoBundle\Widget;
 
+use Contao\ArticleModel;
+use Contao\ContentModel;
+use Contao\FormModel;
+use Contao\ModuleModel;
 use Contao\System;
 use InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator;
 
 class IncludeInfoWidget extends \Contao\Widget
 {
-    protected $strTemplate = 'be_include';
-
     public function generate(): void
     {
     }
@@ -28,9 +30,6 @@ class IncludeInfoWidget extends \Contao\Widget
         // Get the active record
         $activeRecord = $this->dataContainer->activeRecord;
 
-        // Get the type
-        $type = $activeRecord->type;
-
         // Get the table
         $table = $this->strTable;
 
@@ -38,30 +37,31 @@ class IncludeInfoWidget extends \Contao\Widget
         /** @var IncludesAggregator $aggregator */
         $aggregator = System::getContainer()->get(IncludesAggregator::class);
 
-        // Determine aggregation
-        if ('alias' === $type) {
-            $this->original = $aggregator->getContentElement((int) $activeRecord->cteAlias);
-            $includes = $aggregator->getContentElementIncludes((int) $activeRecord->cteAlias);
-            unset($includes[(int) $activeRecord->id]);
-            $this->includes = $includes;
-        } elseif ('article' === $type) {
-            $this->original = $aggregator->getArticle((int) $activeRecord->articleAlias);
-            $includes = $aggregator->getArticleIncludes((int) $activeRecord->articleAlias);
-            unset($includes[(int) $activeRecord->id]);
-            $this->includes = $includes;
-        } elseif ('tl_content' === $table) {
-            $this->includes = $aggregator->getContentElementIncludes((int) $activeRecord->id);
-        } elseif ('tl_article' === $table) {
-            $this->includes = $aggregator->getArticleIncludes((int) $activeRecord->id);
+        // Render includes
+        if (ContentModel::getTable() === $table) {
+            $element = ContentModel::findByPk((int) $activeRecord->id);
+
+            return $aggregator->renderIncludesForContentElement($element) ?? '';
         }
 
-        // Add CSS
-        $GLOBALS['TL_CSS'][self::class] = 'bundles/includeinfo/be_styles.css';
+        if (ArticleModel::getTable() === $table) {
+            $article = ArticleModel::findByPk((int) $activeRecord->id);
 
-        if (empty($this->includes) && empty($this->original)) {
-            return '';
+            return $aggregator->renderIncludesForArticle($article) ?? '';
         }
 
-        return parent::parse($attributes);
+        if (ModuleModel::getTable() === $table) {
+            $module = ModuleModel::findByPk((int) $activeRecord->id);
+
+            return $aggregator->renderIncludesForModule($module) ?? '';
+        }
+
+        if (FormModel::getTable() === $table) {
+            $form = FormModel::findByPk((int) $activeRecord->id);
+
+            return $aggregator->renderIncludesForForm($form) ?? '';
+        }
+
+        return '<p class="tl_error">Widget not supported for '.$table.'</p>';
     }
 }

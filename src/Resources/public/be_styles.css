@@ -4,10 +4,19 @@
 
 .tl_content .tl_includes,
 .tl_box .tl_includes {
-    padding: 5px 6px 5px 5px;
+    padding: 5px 6px;
+}
+
+.tl_content .tl_includes {
+    background-color: rgb(250,250,250);
+}
+
+.tl_content:hover .tl_includes,
+.tl_box .tl_includes {
     background-color: #3a454d;
-    border-left: 4px solid #f47c00;
+    border-left: 3px solid #f47c00;
     color: white;
+    padding-left: 3px;
 }
 
 .tl_includes a {
@@ -21,7 +30,8 @@
 .tl_includes th {
     font-weight: normal;
 	padding-right: 5px;
-	text-align: right;
+    text-align: right;
+    vertical-align: text-top;
 }
 
 .tl_content .tl_includes {

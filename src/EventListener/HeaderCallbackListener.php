@@ -14,21 +14,35 @@ namespace InspiredMinds\IncludeInfoBundle\EventListener;
 
 use Contao\ArticleModel;
 use Contao\DataContainer;
-use Contao\DC_Table;
+use Contao\FormModel;
 use Contao\Input;
-use InspiredMinds\IncludeInfoBundle\Widget\IncludeInfoWidget;
+use InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator;
 
 class HeaderCallbackListener
 {
+    private $aggregator;
+
+    public function __construct(IncludesAggregator $aggregator)
+    {
+        $this->aggregator = $aggregator;
+    }
+
     public function onHeaderCallback(array $add, DataContainer $dc): array
     {
-        $widget = new IncludeInfoWidget(['strTable' => 'tl_article']);
-        $widget->dataContainer = new DC_Table('tl_article');
-        $widget->dataContainer->activeRecord = ArticleModel::findByPk((int) Input::get('id'));
-        $includeInfo = trim($widget->parse());
+        if ('article' === Input::get('do')) {
+            $article = ArticleModel::findByPk((int) Input::get('id'));
+            $includeInfo = $this->aggregator->renderIncludesForArticle($article);
 
-        if (!empty($includeInfo)) {
-            $add[$GLOBALS['TL_LANG']['tl_content']['includeinfo_legend']] = $includeInfo;
+            if (!empty($includeInfo)) {
+                $add[$GLOBALS['TL_LANG']['tl_article']['includeinfo_legend']] = $includeInfo;
+            }
+        } elseif ('form' === Input::get('do')) {
+            $form = FormModel::findByPk((int) Input::get('id'));
+            $includeInfo = $this->aggregator->renderIncludesForForm($form);
+
+            if (!empty($includeInfo)) {
+                $add[$GLOBALS['TL_LANG']['tl_form']['includeinfo_legend']] = $includeInfo;
+            }
         }
 
         return $add;

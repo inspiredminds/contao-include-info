@@ -4,3 +4,13 @@ services:
     arguments:
       - '@router'
       - '@request_stack'
+
+  InspiredMinds\IncludeInfoBundle\EventListener\HeaderCallbackListener:
+    public: true
+    arguments:
+      - '@InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator'
+
+  InspiredMinds\IncludeInfoBundle\EventListener\ContentChildRecordCallbackListener:
+    public: true
+    arguments:
+      - '@InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator'

@@ -10,4 +10,4 @@ declare(strict_types=1);
  * @license LGPL-3.0-or-later
  */
 
-$GLOBALS['TL_LANG']['tl_content']['includeinfo_legend'] = 'Include-Info';
+$GLOBALS['TL_LANG']['tl_form']['includeinfo_legend'] = 'Include info';
