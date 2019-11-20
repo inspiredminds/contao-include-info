@@ -38,30 +38,28 @@ class IncludeInfoWidget extends \Contao\Widget
         $aggregator = System::getContainer()->get(IncludesAggregator::class);
 
         // Render includes
+        $includes = null;
+
         if (ContentModel::getTable() === $table) {
             $element = ContentModel::findByPk((int) $activeRecord->id);
 
-            return $aggregator->renderIncludesForContentElement($element) ?? '';
-        }
-
-        if (ArticleModel::getTable() === $table) {
+            $includes = $aggregator->renderIncludesForContentElement($element);
+        } elseif (ArticleModel::getTable() === $table) {
             $article = ArticleModel::findByPk((int) $activeRecord->id);
 
-            return $aggregator->renderIncludesForArticle($article) ?? '';
-        }
-
-        if (ModuleModel::getTable() === $table) {
+            $includes = $aggregator->renderIncludesForArticle($article);
+        } elseif (ModuleModel::getTable() === $table) {
             $module = ModuleModel::findByPk((int) $activeRecord->id);
 
-            return $aggregator->renderIncludesForModule($module) ?? '';
-        }
-
-        if (FormModel::getTable() === $table) {
+            $includes = $aggregator->renderIncludesForModule($module);
+        } elseif (FormModel::getTable() === $table) {
             $form = FormModel::findByPk((int) $activeRecord->id);
 
-            return $aggregator->renderIncludesForForm($form) ?? '';
+            $includes = $aggregator->renderIncludesForForm($form);
+        } else {
+            return '<p class="tl_error">Widget not supported for '.$table.'</p>';
         }
 
-        return '<p class="tl_error">Widget not supported for '.$table.'</p>';
+        return $includes ?? '<p class="tl_help">'.$GLOBALS['TL_LANG']['MSC']['inc_noIncludes'].'</p>';
     }
 }
