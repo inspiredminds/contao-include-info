@@ -29,19 +29,25 @@ class HeaderCallbackListener
 
     public function onHeaderCallback(array $add, DataContainer $dc): array
     {
-        if ('article' === Input::get('do')) {
-            $article = ArticleModel::findByPk((int) Input::get('id'));
-            $includeInfo = $this->aggregator->renderIncludesForArticle($article);
+        if (null !== Input::get('act')) {
+            return $add;
+        }
 
-            if (!empty($includeInfo)) {
-                $add[$GLOBALS['TL_LANG']['tl_article']['includeinfo_legend']] = $includeInfo;
+        if ('tl_content' === $dc->table) {
+            if (null !== ($article = ArticleModel::findByPk((int) $dc->id))) {
+                $includeInfo = $this->aggregator->renderIncludesForArticle($article);
+
+                if (!empty($includeInfo)) {
+                    $add[$GLOBALS['TL_LANG']['tl_article']['includeinfo_legend']] = $includeInfo;
+                }
             }
-        } elseif ('form' === Input::get('do')) {
-            $form = FormModel::findByPk((int) Input::get('id'));
-            $includeInfo = $this->aggregator->renderIncludesForForm($form);
+        } elseif ('tl_form_field' === $dc->table) {
+            if (null !== ($form = FormModel::findByPk((int) $dc->id))) {
+                $includeInfo = $this->aggregator->renderIncludesForForm($form);
 
-            if (!empty($includeInfo)) {
-                $add[$GLOBALS['TL_LANG']['tl_form']['includeinfo_legend']] = $includeInfo;
+                if (!empty($includeInfo)) {
+                    $add[$GLOBALS['TL_LANG']['tl_form']['includeinfo_legend']] = $includeInfo;
+                }
             }
         }
 
