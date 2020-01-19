@@ -42,3 +42,41 @@
 .tl_header_table .tl_includes th {
     display: none;
 }
+
+.tl_content .tl_includes td.includes ul li {
+    line-height: 17px;
+}
+
+.tl_content .tl_includes .includes--limit-height ul {
+    max-height: 17px;
+    padding-bottom: 17px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tl_content .tl_includes .includes--limit-height ul li + li {
+    display: none;
+}
+
+.tl_content .tl_includes .includes--limit-height ul:after {
+    content: '…';
+    position: absolute;
+    left: 0;
+    line-height: 17px;
+    bottom: 0;
+    display: block;
+    float: left;
+}
+
+.tl_content .tl_includes .includes--limit-height.show ul {
+    max-height: none;
+    padding-bottom: 0;
+}
+
+.tl_content .tl_includes .includes--limit-height.show ul li + li {
+    display: block;
+}
+
+.tl_content .tl_includes .includes--limit-height.show ul:after {
+    display: none;
+}

@@ -14,14 +14,17 @@ namespace InspiredMinds\IncludeInfoBundle\Aggregator;
 
 use Contao\ArticleModel;
 use Contao\BackendTemplate;
+use Contao\Config;
 use Contao\ContentModel;
 use Contao\FormModel;
+use Contao\FrontendTemplate;
 use Contao\LayoutModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\ThemeModel;
+use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -45,14 +48,14 @@ final class IncludesAggregator
 
     public function renderIncludesForForm(FormModel $form): ?string
     {
-        $includes = $this->getFormIncludes((int) $form->id);
+        $includes = array_merge($this->getFormIncludes((int) $form->id), $this->getInsertTags('insert_form', (int) $form->id));
 
         return $this->renderIncludes(null, $includes, FormModel::getTable());
     }
 
     public function renderIncludesForModule(ModuleModel $module): ?string
     {
-        $includes = $this->getModuleIncludes((int) $module->id);
+        $includes = array_merge($this->getModuleIncludes((int) $module->id), $this->getInsertTags('insert_module', (int) $module->id));
 
         return $this->renderIncludes(null, $includes, ModuleModel::getTable());
     }
@@ -89,7 +92,7 @@ final class IncludesAggregator
 
     private function getContentElementIncludes(int $elementId, int $ignoreId = null): array
     {
-        return $this->getContentElements('cteAlias', 'alias', $elementId, $ignoreId);
+        return array_merge($this->getContentElements('cteAlias', 'alias', $elementId, $ignoreId), $this->getInsertTags('insert_content', $elementId));
     }
 
     private function getContentElement(int $contentElementId): ?array
@@ -133,7 +136,7 @@ final class IncludesAggregator
 
     private function getArticleIncludes(int $articleId, int $ignoreId = null): array
     {
-        return $this->getContentElements('articleAlias', 'article', $articleId, $ignoreId);
+        return array_merge($this->getContentElements('articleAlias', 'article', $articleId, $ignoreId), $this->getInsertTags('insert_article', $articleId));
     }
 
     private function getArticle(int $articleId): ?array
@@ -282,14 +285,45 @@ final class IncludesAggregator
         return $includes;
     }
 
+    private function getInsertTags(string $insertTag, int $id): array
+    {
+        $includes = [];
+
+        if (null !== ($insertTags = InsertTagIndexModel::findByTagParams($insertTag, (string) $id))) {
+            foreach ($insertTags as $insertTag) {
+                $include = [
+                    'crumbs' => [$insertTag->url],
+                    'title' => '<code>'.$insertTag->getInsertTagString().'</code>',
+                ];
+
+                if (!empty($insertTag->pid)) {
+                    $include['link'] = $this->router->generate('contao_backend', [
+                        'do' => 'article',
+                        'pn' => $insertTag->pid,
+                        'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
+                        'rt' => RequestToken::get(),
+                    ]);
+                }
+
+                $includes[] = $include;
+            }
+        }
+
+        return $includes;
+    }
+
     private function renderIncludes(?array $original, ?array $includes, string $class = null): ?string
     {
         if (empty($includes) && empty($original)) {
             return null;
         }
 
-        // Add CSS
+        // Add CSS and JS
         $GLOBALS['TL_CSS'][self::class] = 'bundles/includeinfo/be_styles.css';
+
+        if (!Config::get('doNotCollapse')) {
+            $GLOBALS['TL_MOOTOOLS'][self::class] = FrontendTemplate::generateScriptTag('bundles/includeinfo/be_javascript.js');
+        }
 
         // Prepare the template
         $template = new BackendTemplate('be_includes');
