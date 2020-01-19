@@ -1,4 +1,8 @@
 services:
+  _defaults:
+    autoconfigure: true
+    public: false
+
   InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator:
     public: true
     arguments:
@@ -14,3 +18,14 @@ services:
     public: true
     arguments:
       - '@InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator'
+
+  InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener:
+    public: true
+
+  InspiredMinds\IncludeInfoBundle\EventSubscriber\KernelTerminateSubscriber:
+    arguments:
+      - '@contao.routing.scope_matcher'
+      - '@contao.framework'
+      - '@database_connection'
+      - '@InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener'
+      - '@logger'
