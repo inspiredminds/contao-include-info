@@ -107,6 +107,10 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         }
 
         // Delete all other indexed insert tags for this URL that have not been processed in the current request
-        $this->db->prepare('DELETE FROM tl_inserttag_index WHERE `url` = ? AND `id` NOT IN ('.implode(',', $indexIds).')')->execute([$url]);
+        if (!empty($indexIds)) {
+            $this->db->prepare('DELETE FROM tl_inserttag_index WHERE `url` = ? AND `id` NOT IN ('.implode(',', $indexIds).')')->execute([$url]);
+        } else {
+            $this->db->prepare('DELETE FROM tl_inserttag_index WHERE `url` = ?')->execute([$url]);
+        }
     }
 }
