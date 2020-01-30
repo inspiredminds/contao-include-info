@@ -129,9 +129,7 @@ final class IncludesAggregator
                 'do' => 'article',
                 'table' => 'tl_content',
                 'id' => $article->id,
-                'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                'rt' => RequestToken::get(),
             ]),
         ];
     }
@@ -167,9 +165,7 @@ final class IncludesAggregator
                 'do' => 'article',
                 'table' => 'tl_content',
                 'id' => $article->id,
-                'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                'rt' => RequestToken::get(),
             ]),
         ];
     }
@@ -190,9 +186,7 @@ final class IncludesAggregator
                 'do' => 'form',
                 'table' => 'tl_form_field',
                 'id' => $form->id,
-                'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                'rt' => RequestToken::get(),
             ]),
         ];
     }
@@ -220,9 +214,7 @@ final class IncludesAggregator
                 'do' => 'themes',
                 'table' => 'tl_module',
                 'id' => $module->id,
-                'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                'rt' => RequestToken::get(),
             ]),
         ];
     }
