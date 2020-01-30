@@ -33,6 +33,7 @@
 	padding-right: 5px;
     text-align: right;
     vertical-align: text-top;
+    color: inherit;
 }
 
 .tl_content .tl_includes {
