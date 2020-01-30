@@ -214,7 +214,9 @@ final class IncludesAggregator
                 'do' => 'themes',
                 'table' => 'tl_module',
                 'id' => $module->id,
+                'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
+                'rt' => RequestToken::get(),
             ]),
         ];
     }
