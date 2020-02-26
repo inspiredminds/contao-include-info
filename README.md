@@ -1,4 +1,4 @@
-[![](https://img.shields.io/maintenance/yes/2017.svg)](https://github.com/inspiredminds/contao-include-info)
+[![](https://img.shields.io/maintenance/yes/2020.svg)](https://github.com/inspiredminds/contao-include-info)
 [![](https://img.shields.io/packagist/v/inspiredminds/contao-include-info.svg)](https://packagist.org/packages/inspiredminds/contao-include-info)
 [![](https://img.shields.io/packagist/dt/inspiredminds/contao-include-info.svg)](https://packagist.org/packages/inspiredminds/contao-include-info)
 
