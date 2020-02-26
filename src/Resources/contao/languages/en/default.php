@@ -10,5 +10,6 @@ declare(strict_types=1);
  * @license LGPL-3.0-or-later
  */
 
-$GLOBALS['TL_LANG']['tl_article']['inc_originalLabel'] = 'Original:';
-$GLOBALS['TL_LANG']['tl_article']['inc_includesLabel'] = 'Includes:';
+$GLOBALS['TL_LANG']['MSC']['inc_originalLabel'] = 'Original:';
+$GLOBALS['TL_LANG']['MSC']['inc_includesLabel'] = 'Includes:';
+$GLOBALS['TL_LANG']['MSC']['inc_noIncludes'] = 'No information found.';
