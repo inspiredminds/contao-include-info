@@ -26,7 +26,7 @@
     "require": {
         "php": ">=7.1",
         "contao/core-bundle": "^4.4",
-        "symfony/framework-bundle": "^3.0 || ^4.0",
+        "symfony/framework-bundle": "^3.0 || ^4.1.12",
         "symfony/dependency-injection": "^3.4.26 || ^4.1.12"
     },
     "autoload": {
