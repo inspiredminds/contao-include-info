@@ -1,9 +1,10 @@
 {
     "name": "inspiredminds/contao-include-info",
-    "description": "Contao extension to synchronize events between different installations.",
-    "keywords": ["contao", "calendar", "event", "sync"],
+    "description": "Contao extension to provide additional info for include elements in the back end.",
+    "keywords": ["contao", "include", "module", "content element", "form"],
     "type": "contao-bundle",
-    "license": "proprietary",
+    "homepage": "https://github.com/inspiredminds/contao-include-info",
+    "license": "LGPL-3.0-or-later",
     "authors": [
         {
             "name": "Fritz Michael Gschwantner",
@@ -13,8 +14,15 @@
         }
     ],
     "support": {
-        "email": "office@inspiredminds.at"
+        "issues": "https://github.com/inspiredminds/contao-include-info/issues",
+        "source": "https://github.com/inspiredminds/contao-include-info"
     },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/fritzmg"
+        }
+    ],
     "require": {
         "php": ">=7.1",
         "contao/core-bundle": "^4.4",
