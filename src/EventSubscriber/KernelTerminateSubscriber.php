@@ -20,7 +20,7 @@ use InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener;
 use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class KernelTerminateSubscriber implements EventSubscriberInterface
@@ -54,7 +54,7 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onKernelTerminate(PostResponseEvent $event): void
+    public function onKernelTerminate(TerminateEvent $event): void
     {
         if (!$this->framework->isInitialized() || !$this->scopeMatcher->isFrontendRequest($event->getRequest())) {
             return;
