@@ -15,7 +15,7 @@ namespace InspiredMinds\IncludeInfoBundle\EventSubscriber;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\InsertTags;
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener;
 use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
 use Psr\Log\LoggerInterface;
