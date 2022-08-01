@@ -13,12 +13,13 @@ declare(strict_types=1);
 namespace InspiredMinds\IncludeInfoBundle\EventSubscriber;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\InsertTags;
 use Doctrine\DBAL\Connection;
 use InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener;
 use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
-use Psr\Log\LoggerInterface;
+use Nyholm\Psr7\Uri;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -36,15 +37,15 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
     private $framework;
     private $db;
     private $insertTagListener;
-    private $logger;
+    private $insertTagParser;
 
-    public function __construct(ScopeMatcher $scopeMatcher, ContaoFramework $framework, Connection $db, ReplaceInsertTagsListener $insertTagListener, LoggerInterface $logger)
+    public function __construct(ScopeMatcher $scopeMatcher, ContaoFramework $framework, Connection $db, ReplaceInsertTagsListener $insertTagListener, InsertTagParser $insertTagParser)
     {
         $this->scopeMatcher = $scopeMatcher;
         $this->framework = $framework;
         $this->db = $db;
         $this->insertTagListener = $insertTagListener;
-        $this->logger = $logger;
+        $this->insertTagParser = $insertTagParser;
     }
 
     public static function getSubscribedEvents()
@@ -61,7 +62,8 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         }
 
         // Get the cached insert tags from the insert tag listener
-        (new InsertTags())->replace('{{'.ReplaceInsertTagsListener::INDEX_INSERT_TAG.'}}');
+        $insertTags = new InsertTags();
+        $this->insertTagParser->replace('{{'.ReplaceInsertTagsListener::INDEX_INSERT_TAG.'}}');
         $insertTags = $this->insertTagListener->getInsertTags();
 
         // Index the insert tags for the current URL
@@ -71,6 +73,9 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $url = $request->getSchemeAndHttpHost().strtok($request->getRequestUri(), '?');
         $url = str_replace($request->server->get('SCRIPT_NAME'), '', $url);
+
+        // Normalize the URL
+        $url = (string) (new Uri($url));
 
         foreach ($insertTags as $insertTag) {
             $flags = explode('|', $insertTag);
@@ -108,9 +113,9 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
 
         // Delete all other indexed insert tags for this URL that have not been processed in the current request
         if (!empty($indexIds)) {
-            $this->db->prepare('DELETE FROM tl_inserttag_index WHERE `url` = ? AND `id` NOT IN ('.implode(',', $indexIds).')')->execute([$url]);
+            $this->db->executeStatement('DELETE FROM tl_inserttag_index WHERE `url` = ? AND `id` NOT IN ('.implode(',', $indexIds).')', [$url]);
         } else {
-            $this->db->prepare('DELETE FROM tl_inserttag_index WHERE `url` = ?')->execute([$url]);
+            $this->db->executeStatement('DELETE FROM tl_inserttag_index WHERE `url` = ?', [$url]);
         }
     }
 }

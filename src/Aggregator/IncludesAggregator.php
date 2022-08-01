@@ -16,12 +16,12 @@ use Contao\ArticleModel;
 use Contao\BackendTemplate;
 use Contao\Config;
 use Contao\ContentModel;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\FormModel;
 use Contao\FrontendTemplate;
 use Contao\LayoutModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\ThemeModel;
 use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
@@ -32,11 +32,13 @@ final class IncludesAggregator
 {
     private $router;
     private $requestStack;
+    private $tokenManager;
 
-    public function __construct(RouterInterface $router, RequestStack $requestStack)
+    public function __construct(RouterInterface $router, RequestStack $requestStack, ContaoCsrfTokenManager $tokenManager)
     {
         $this->router = $router;
         $this->requestStack = $requestStack;
+        $this->tokenManager = $tokenManager;
     }
 
     public function renderIncludesForArticle(ArticleModel $article): ?string
@@ -216,7 +218,7 @@ final class IncludesAggregator
                 'id' => $module->id,
                 'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                'rt' => RequestToken::get(),
+                'rt' => $this->tokenManager->getDefaultTokenValue(),
             ]),
         ];
     }
@@ -248,7 +250,7 @@ final class IncludesAggregator
                                 'id' => $layout->id,
                                 'act' => 'edit',
                                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                                'rt' => RequestToken::get(),
+                                'rt' => $this->tokenManager->getDefaultTokenValue(),
                             ]),
                         ];
                         break;
@@ -303,7 +305,7 @@ final class IncludesAggregator
                         'do' => 'article',
                         'pn' => $insertTag->pid,
                         'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                        'rt' => RequestToken::get(),
+                        'rt' => $this->tokenManager->getDefaultTokenValue(),
                     ]);
                 }
 

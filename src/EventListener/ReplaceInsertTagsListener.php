@@ -12,12 +12,15 @@ declare(strict_types=1);
 
 namespace InspiredMinds\IncludeInfoBundle\EventListener;
 
+use Contao\CoreBundle\ServiceAnnotation\Hook;
+
+/**
+ * @Hook("replaceInsertTags")
+ */
 class ReplaceInsertTagsListener
 {
     public const INDEX_INSERT_TAG = 'include_info_index';
 
-    private $db;
-    private $requestStack;
     private $insertTags = [];
 
     public function __invoke(

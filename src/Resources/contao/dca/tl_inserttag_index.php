@@ -32,7 +32,7 @@ $GLOBALS['TL_DCA']['tl_inserttag_index'] = [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'url' => [
-            'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+            'sql' => ['type' => 'string', 'length' => 2048, 'default' => '', 'customSchemaOptions' => ['collation' => 'ascii_bin']],
         ],
         'tag' => [
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],

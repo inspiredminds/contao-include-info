@@ -17,9 +17,10 @@ use Contao\ContentModel;
 use Contao\FormModel;
 use Contao\ModuleModel;
 use Contao\System;
+use Contao\Widget;
 use InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator;
 
-class IncludeInfoWidget extends \Contao\Widget
+class IncludeInfoWidget extends Widget
 {
     public function generate(): void
     {

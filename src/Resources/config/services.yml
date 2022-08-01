@@ -28,4 +28,4 @@ services:
       - '@contao.framework'
       - '@database_connection'
       - '@InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener'
-      - '@logger'
+      - '@contao.insert_tag.parser'
