@@ -8,6 +8,7 @@ services:
     arguments:
       - '@router'
       - '@request_stack'
+      - '@contao.csrf.token_manager'
 
   InspiredMinds\IncludeInfoBundle\EventListener\HeaderCallbackListener:
     public: true
