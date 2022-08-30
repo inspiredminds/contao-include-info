@@ -21,6 +21,7 @@ use InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener;
 use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
 use Nyholm\Psr7\Uri;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -39,7 +40,7 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
     private $insertTagListener;
     private $insertTagParser;
 
-    public function __construct(ScopeMatcher $scopeMatcher, ContaoFramework $framework, Connection $db, ReplaceInsertTagsListener $insertTagListener, InsertTagParser $insertTagParser)
+    public function __construct(ScopeMatcher $scopeMatcher, ContaoFramework $framework, Connection $db, ReplaceInsertTagsListener $insertTagListener, ?InsertTagParser $insertTagParser)
     {
         $this->scopeMatcher = $scopeMatcher;
         $this->framework = $framework;
@@ -59,6 +60,11 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
+        // Only handle GET requests
+        if (!$request->isMethod(Request::METHOD_GET)) {
+            return;
+        }
+
         // Get normalized URL
         $url = $request->getSchemeAndHttpHost().strtok($request->getRequestUri(), '?');
         $url = str_replace($request->server->get('SCRIPT_NAME'), '', $url);
@@ -76,14 +82,20 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Do not index if framework was not initialized or this is not a front end request
-        if (!$this->framework->isInitialized() || !$this->scopeMatcher->isFrontendRequest($request)) {
+        // Do not index if framework was not initialized
+        if (!$this->framework->isInitialized()) {
             return;
         }
 
         // Get the cached insert tags from the insert tag listener
         $insertTags = new InsertTags();
-        $this->insertTagParser->replace('{{'.ReplaceInsertTagsListener::INDEX_INSERT_TAG.'}}');
+
+        if (null !== $this->insertTagParser) {
+            $this->insertTagParser->replace('{{'.ReplaceInsertTagsListener::INDEX_INSERT_TAG.'}}');
+        } else {
+            (new InsertTags())->replace('{{'.ReplaceInsertTagsListener::INDEX_INSERT_TAG.'}}');
+        }
+
         $insertTags = $this->insertTagListener->getInsertTags();
 
         // Index the insert tags for the current URL

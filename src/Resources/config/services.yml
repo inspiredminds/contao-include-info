@@ -30,4 +30,4 @@ services:
       - '@contao.framework'
       - '@database_connection'
       - '@InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener'
-      - '@contao.insert_tag.parser'
+      - '@?contao.insert_tag.parser'
