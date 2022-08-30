@@ -25,7 +25,9 @@
     ],
     "require": {
         "php": ">=7.1",
-        "contao/core-bundle": "^4.13 || ^5.0",
+        "contao/core-bundle": "^4.9 || ^5.0",
+        "doctrine/dbal": "^2.11 || ^3.0",
+        "nyholm/psr7": "^1.2",
         "symfony/config": "^4.4 || ^5.2 || ^6.0",
         "symfony/dependency-injection": "^4.4 || ^5.2 || ^6.0",
         "symfony/event-dispatcher": "^4.4 || ^5.2 || ^6.0",

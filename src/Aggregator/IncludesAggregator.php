@@ -33,12 +33,14 @@ final class IncludesAggregator
     private $router;
     private $requestStack;
     private $tokenManager;
+    private $tokenName;
 
-    public function __construct(RouterInterface $router, RequestStack $requestStack, ContaoCsrfTokenManager $tokenManager)
+    public function __construct(RouterInterface $router, RequestStack $requestStack, ContaoCsrfTokenManager $tokenManager, string $tokenName)
     {
         $this->router = $router;
         $this->requestStack = $requestStack;
         $this->tokenManager = $tokenManager;
+        $this->tokenName = $tokenName;
     }
 
     public function renderIncludesForArticle(ArticleModel $article): ?string
@@ -218,7 +220,7 @@ final class IncludesAggregator
                 'id' => $module->id,
                 'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                'rt' => $this->tokenManager->getDefaultTokenValue(),
+                'rt' => $this->tokenManager->getToken($this->tokenName),
             ]),
         ];
     }
@@ -250,7 +252,7 @@ final class IncludesAggregator
                                 'id' => $layout->id,
                                 'act' => 'edit',
                                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                                'rt' => $this->tokenManager->getDefaultTokenValue(),
+                                'rt' => $this->tokenManager->getToken($this->tokenName),
                             ]),
                         ];
                         break;
@@ -305,7 +307,7 @@ final class IncludesAggregator
                         'do' => 'article',
                         'pn' => $insertTag->pid,
                         'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                        'rt' => $this->tokenManager->getDefaultTokenValue(),
+                        'rt' => $this->tokenManager->getToken($this->tokenName),
                     ]);
                 }
 
