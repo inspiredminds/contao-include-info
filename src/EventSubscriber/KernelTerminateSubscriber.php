@@ -57,7 +57,27 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
-        if (!$this->framework->isInitialized() || !$this->scopeMatcher->isFrontendRequest($event->getRequest())) {
+        $request = $event->getRequest();
+
+        // Get normalized URL
+        $url = $request->getSchemeAndHttpHost().strtok($request->getRequestUri(), '?');
+        $url = str_replace($request->server->get('SCRIPT_NAME'), '', $url);
+        $url = (string) (new Uri($url));
+
+        // Discard any overly long URLs
+        if (mb_strlen($url) > 2048) {
+            return;
+        }
+
+        // Delete previous entries if response is not 2xx
+        if (!$event->getResponse()->isSuccessful()) {
+            $this->db->executeStatement('DELETE FROM tl_inserttag_index WHERE `url` = ?', [$url]);
+
+            return;
+        }
+
+        // Do not index if framework was not initialized or this is not a front end request
+        if (!$this->framework->isInitialized() || !$this->scopeMatcher->isFrontendRequest($request)) {
             return;
         }
 
@@ -70,12 +90,6 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         global $objPage;
         $pid = null !== $objPage ? (int) $objPage->id : null;
         $indexIds = [];
-        $request = $event->getRequest();
-        $url = $request->getSchemeAndHttpHost().strtok($request->getRequestUri(), '?');
-        $url = str_replace($request->server->get('SCRIPT_NAME'), '', $url);
-
-        // Normalize the URL
-        $url = (string) (new Uri($url));
 
         foreach ($insertTags as $insertTag) {
             $flags = explode('|', $insertTag);
