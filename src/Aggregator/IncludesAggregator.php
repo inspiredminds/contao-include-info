@@ -295,24 +295,28 @@ final class IncludesAggregator
     {
         $includes = [];
 
-        if (null !== ($insertTags = InsertTagIndexModel::findByTagParams($insertTag, (string) $id))) {
-            foreach ($insertTags as $insertTag) {
-                $include = [
-                    'crumbs' => [$insertTag->url],
-                    'title' => '<code>'.$insertTag->getInsertTagString().'</code>',
-                ];
+        $insertTags = InsertTagIndexModel::findByTagParams($insertTag, (string) $id, ['limit' => 10]);
 
-                if (!empty($insertTag->pid)) {
-                    $include['link'] = $this->router->generate('contao_backend', [
-                        'do' => 'article',
-                        'pn' => $insertTag->pid,
-                        'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                        'rt' => $this->tokenManager->getToken($this->tokenName),
-                    ]);
-                }
+        if (null === $insertTags) {
+            return $includes;
+        }
 
-                $includes[] = $include;
+        foreach ($insertTags as $insertTag) {
+            $include = [
+                'crumbs' => [$insertTag->url],
+                'title' => '<code>'.$insertTag->getInsertTagString().'</code>',
+            ];
+
+            if (!empty($insertTag->pid)) {
+                $include['link'] = $this->router->generate('contao_backend', [
+                    'do' => 'article',
+                    'pn' => $insertTag->pid,
+                    'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
+                    'rt' => $this->tokenManager->getToken($this->tokenName),
+                ]);
             }
+
+            $includes[] = $include;
         }
 
         return $includes;
