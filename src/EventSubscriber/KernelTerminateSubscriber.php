@@ -65,6 +65,11 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
             return;
         }
 
+        // Only handle front end requests
+        if (!$this->scopeMatcher->isFrontendRequest($request)) {
+            return;
+        }
+
         // Get normalized URL
         $url = $request->getSchemeAndHttpHost().strtok($request->getRequestUri(), '?');
         $url = str_replace($request->server->get('SCRIPT_NAME'), '', $url);
