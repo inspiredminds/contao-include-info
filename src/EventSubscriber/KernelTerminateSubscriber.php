@@ -39,14 +39,16 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
     private $db;
     private $insertTagListener;
     private $insertTagParser;
+    private $enableInsertTagIndex;
 
-    public function __construct(ScopeMatcher $scopeMatcher, ContaoFramework $framework, Connection $db, ReplaceInsertTagsListener $insertTagListener, ?InsertTagParser $insertTagParser)
+    public function __construct(ScopeMatcher $scopeMatcher, ContaoFramework $framework, Connection $db, ReplaceInsertTagsListener $insertTagListener, ?InsertTagParser $insertTagParser, bool $enableInsertTagIndex)
     {
         $this->scopeMatcher = $scopeMatcher;
         $this->framework = $framework;
         $this->db = $db;
         $this->insertTagListener = $insertTagListener;
         $this->insertTagParser = $insertTagParser;
+        $this->enableInsertTagIndex = $enableInsertTagIndex;
     }
 
     public static function getSubscribedEvents()
@@ -58,6 +60,11 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
+        // Check if enabled
+        if (!$this->enableInsertTagIndex) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         // Only handle GET requests

@@ -31,3 +31,4 @@ services:
       - '@database_connection'
       - '@InspiredMinds\IncludeInfoBundle\EventListener\ReplaceInsertTagsListener'
       - '@?contao.insert_tag.parser'
+      - '%contao_include_info.enable_insert_tag_index%'

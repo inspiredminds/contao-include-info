@@ -16,7 +16,7 @@ $GLOBALS['TL_DCA']['tl_inserttag_index'] = [
         'sql' => [
             'keys' => [
                 'id' => 'primary',
-                'tag,params' => 'index'
+                'tag,params' => 'index',
             ],
         ],
     ],
