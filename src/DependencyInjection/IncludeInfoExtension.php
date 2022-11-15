@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class IncludeInfoExtension extends Extension
 {
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'contao_include_info';
     }

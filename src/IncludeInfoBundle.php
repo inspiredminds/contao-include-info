@@ -13,11 +13,12 @@ declare(strict_types=1);
 namespace InspiredMinds\IncludeInfoBundle;
 
 use InspiredMinds\IncludeInfoBundle\DependencyInjection\IncludeInfoExtension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class IncludeInfoBundle extends Bundle
 {
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
         if (null === $this->extension) {
             $this->extension = new IncludeInfoExtension();
