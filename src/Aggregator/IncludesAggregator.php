@@ -200,7 +200,7 @@ final class IncludesAggregator
         // Get the module
         $module = ModuleModel::findByPk($moduleId);
 
-        if (null === $moduleId) {
+        if (null === $module) {
             return null;
         }
 
@@ -234,7 +234,10 @@ final class IncludesAggregator
     {
         $includes = $this->getContentElements('module', 'module', $moduleId, $ignoreId);
 
-        $module = ModuleModel::findByPk($moduleId);
+        if (null === ($module = ModuleModel::findByPk($moduleId))) {
+            return $includes;
+        }
+
         $theme = ThemeModel::findByPk((int) $module->pid);
 
         if (null !== ($layouts = LayoutModel::findByPid($theme->id))) {
