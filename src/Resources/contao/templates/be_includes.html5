@@ -1,3 +1,4 @@
+<?php /** @var Contao\FrontendTemplate $this */ ?>
 
 <?php if ($this->original || $this->includes): ?>
   <div class="tl_includes<?php if ($this->class): ?> tl_includes--<?= $this->class ?><?php endif; ?>">
@@ -5,13 +6,13 @@
       <tbody>
         <?php if ($this->original): ?>
           <tr>
-            <th class="original_label"><?= $GLOBALS['TL_LANG']['MSC']['inc_originalLabel']; ?></i></th>
+            <th class="original_label"><?= $this->trans('MSC.inc_originalLabel') ?></i></th>
             <td class="original"><?php if ($this->original['crumbs']): ?><?= implode(' &raquo; ', $this->original['crumbs']) ?> &rsaquo; <?php endif; ?><a href="<?= $this->original['link']; ?>"><?= $this->original['title']; ?></a></td>
           </tr>
         <?php endif; ?>
         <tr>
           <?php if ($this->includes): ?>
-            <th class="includes_label"><?= $GLOBALS['TL_LANG']['MSC']['inc_includesLabel']; ?></th>
+            <th class="includes_label"><?= $this->trans('MSC.inc_includesLabel') ?></th>
             <td class="includes<?php if (count($this->includes) > 1): ?> includes--multiple<?php if (!\Contao\Config::get('doNotCollapse')): ?> includes--limit-height<?php endif; ?><?php endif; ?>">
               <ul>
                 <?php foreach ($this->includes as $inc): ?>
@@ -25,3 +26,4 @@
     </table>
   </div>
 <?php endif; ?>
+
