@@ -2,6 +2,12 @@
     line-height: normal;
 }
 
+.tl_includes ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .tl_content .tl_includes,
 .tl_box .tl_includes {
     padding: 5px 6px 5px 3px;
@@ -45,28 +51,16 @@
 }
 
 .tl_content .tl_includes td.includes ul li {
-    line-height: 17px;
-}
-
-.tl_content .tl_includes .includes--limit-height ul {
-    max-height: 17px;
-    padding-bottom: 17px;
-    position: relative;
-    overflow: hidden;
+    line-height: normal;
 }
 
 .tl_content .tl_includes .includes--limit-height ul li + li {
     display: none;
 }
 
-.tl_content .tl_includes .includes--limit-height ul:after {
+.tl_content .tl_includes .includes--limit-height ul:has(li + li):after {
     content: '…';
-    position: absolute;
-    left: 0;
-    line-height: 17px;
-    bottom: 0;
     display: block;
-    float: left;
 }
 
 .tl_content .tl_includes .includes--limit-height.show ul {
@@ -80,4 +74,22 @@
 
 .tl_content .tl_includes .includes--limit-height.show ul:after {
     display: none;
+}
+
+/* Contao 5.3+ adjustments */
+[data-contao--limit-height-target] .tl_includes {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    grid-column: 1 / -1;
+    margin: 0;
+    order: 3;
+    background-color: var(--table-header);
+    border-top: 1px solid var(--border);
+    border-left: 0;
+}
+
+.tl_content:hover [data-contao--limit-height-target] .tl_includes {
+    border-left: 0;
+    color: inherit;
+    background-color: var(--table-header);
 }
