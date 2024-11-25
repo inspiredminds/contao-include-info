@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the IncludeInfoBundle.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -42,19 +42,19 @@ class IncludeInfoWidget extends Widget
         $includes = null;
 
         if (ContentModel::getTable() === $table) {
-            $element = ContentModel::findByPk((int) $activeRecord->id);
+            $element = ContentModel::findById((int) $activeRecord->id);
 
             $includes = $aggregator->renderIncludesForContentElement($element);
         } elseif (ArticleModel::getTable() === $table) {
-            $article = ArticleModel::findByPk((int) $activeRecord->id);
+            $article = ArticleModel::findById((int) $activeRecord->id);
 
             $includes = $aggregator->renderIncludesForArticle($article);
         } elseif (ModuleModel::getTable() === $table) {
-            $module = ModuleModel::findByPk((int) $activeRecord->id);
+            $module = ModuleModel::findById((int) $activeRecord->id);
 
             $includes = $aggregator->renderIncludesForModule($module);
         } elseif (FormModel::getTable() === $table) {
-            $form = FormModel::findByPk((int) $activeRecord->id);
+            $form = FormModel::findById((int) $activeRecord->id);
 
             $includes = $aggregator->renderIncludesForForm($form);
         } else {

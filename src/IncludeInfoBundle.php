@@ -18,12 +18,17 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class IncludeInfoBundle extends Bundle
 {
-    public function getContainerExtension(): ?ExtensionInterface
+    public function getContainerExtension(): ExtensionInterface|null
     {
         if (null === $this->extension) {
             $this->extension = new IncludeInfoExtension();
         }
 
         return $this->extension;
+    }
+
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
     }
 }

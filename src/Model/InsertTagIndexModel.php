@@ -19,7 +19,7 @@ class InsertTagIndexModel extends Model
 {
     protected static $strTable = 'tl_inserttag_index';
 
-    public static function findOneByUrlTagParamsFlags(string $url, string $tag, string $params, string $flags, array $options = []): ?Model
+    public static function findOneByUrlTagParamsFlags(string $url, string $tag, string $params, string $flags, array $options = []): Model|null
     {
         $t = static::getTable();
 
@@ -40,7 +40,7 @@ class InsertTagIndexModel extends Model
         return static::findOneBy($columns, $values, $options);
     }
 
-    public static function findByTagParams(string $tag, string $params, array $options = []): ?Collection
+    public static function findByTagParams(string $tag, string $params, array $options = []): Collection|null
     {
         $t = static::getTable();
 

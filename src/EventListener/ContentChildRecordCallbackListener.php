@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the IncludeInfoBundle.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -14,28 +14,24 @@ namespace InspiredMinds\IncludeInfoBundle\EventListener;
 
 use Contao\ContentModel;
 use InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator;
-use tl_content;
 
 class ContentChildRecordCallbackListener
 {
-    private $aggregator;
-
-    public function __construct(IncludesAggregator $aggregator)
+    public function __construct(private readonly IncludesAggregator $aggregator)
     {
-        $this->aggregator = $aggregator;
     }
 
     public function onChildRecordCallback(array $row): string
     {
         // Render child record
-        $childRecord = (new tl_content())->addCteType($row);
+        $childRecord = (new \tl_content())->addCteType($row);
 
         if ('tl_article' !== $row['ptable']) {
             return $childRecord;
         }
 
         // Get the content element
-        $element = ContentModel::findByPk((int) $row['id']);
+        $element = ContentModel::findById((int) $row['id']);
 
         // Render the include info for the content element
         $includeInfo = $this->aggregator->renderIncludesForContentElement($element);

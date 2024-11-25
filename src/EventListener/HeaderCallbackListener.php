@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the IncludeInfoBundle.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -20,11 +20,8 @@ use InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator;
 
 class HeaderCallbackListener
 {
-    private $aggregator;
-
-    public function __construct(IncludesAggregator $aggregator)
+    public function __construct(private readonly IncludesAggregator $aggregator)
     {
-        $this->aggregator = $aggregator;
     }
 
     public function onHeaderCallback(array $add, DataContainer $dc): array
@@ -34,18 +31,18 @@ class HeaderCallbackListener
         }
 
         if ('tl_content' === $dc->table) {
-            if (null !== ($article = ArticleModel::findByPk((int) $dc->id))) {
+            if (null !== ($article = ArticleModel::findById((int) $dc->id))) {
                 $includeInfo = $this->aggregator->renderIncludesForArticle($article);
 
-                if (!empty($includeInfo)) {
+                if (null !== $includeInfo && '' !== $includeInfo && '0' !== $includeInfo) {
                     $add[$GLOBALS['TL_LANG']['tl_article']['includeinfo_legend']] = $includeInfo;
                 }
             }
         } elseif ('tl_form_field' === $dc->table) {
-            if (null !== ($form = FormModel::findByPk((int) $dc->id))) {
+            if (null !== ($form = FormModel::findById((int) $dc->id))) {
                 $includeInfo = $this->aggregator->renderIncludesForForm($form);
 
-                if (!empty($includeInfo)) {
+                if (null !== $includeInfo && '' !== $includeInfo && '0' !== $includeInfo) {
                     $add[$GLOBALS['TL_LANG']['tl_form']['includeinfo_legend']] = $includeInfo;
                 }
             }

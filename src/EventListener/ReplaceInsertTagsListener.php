@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the IncludeInfoBundle.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -23,14 +23,8 @@ class ReplaceInsertTagsListener
 
     private $insertTags = [];
 
-    public function __invoke(
-        string $insertTag,
-        bool $useCache,
-        string $cachedValue,
-        array $flags,
-        array $tags,
-        array $cache
-    ) {
+    public function __invoke(string $insertTag, bool $useCache, string $cachedValue, array $flags, array $tags, array $cache)
+    {
         if (self::INDEX_INSERT_TAG === $insertTag) {
             $this->insertTags = array_keys($cache);
 

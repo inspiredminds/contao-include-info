@@ -30,41 +30,37 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class IncludesAggregator
 {
-    private $router;
-    private $requestStack;
-    private $tokenManager;
-    private $tokenName;
-
-    public function __construct(RouterInterface $router, RequestStack $requestStack, ContaoCsrfTokenManager $tokenManager, string $tokenName)
-    {
-        $this->router = $router;
-        $this->requestStack = $requestStack;
-        $this->tokenManager = $tokenManager;
-        $this->tokenName = $tokenName;
+    public function __construct(
+        private readonly RouterInterface $router,
+        private readonly RequestStack $requestStack,
+        private readonly ContaoCsrfTokenManager $tokenManager,
+        private readonly string $tokenName,
+        private readonly bool $enableIndex,
+    ) {
     }
 
-    public function renderIncludesForArticle(ArticleModel $article): ?string
+    public function renderIncludesForArticle(ArticleModel $article): string|null
     {
         $includes = $this->getArticleIncludes((int) $article->id);
 
         return $this->renderIncludes(null, $includes, ArticleModel::getTable());
     }
 
-    public function renderIncludesForForm(FormModel $form): ?string
+    public function renderIncludesForForm(FormModel $form): string|null
     {
-        $includes = array_merge($this->getFormIncludes((int) $form->id), $this->getInsertTags('insert_form', (int) $form->id));
+        $includes = [...$this->getFormIncludes((int) $form->id), ...$this->getInsertTags('insert_form', (int) $form->id)];
 
         return $this->renderIncludes(null, $includes, FormModel::getTable());
     }
 
-    public function renderIncludesForModule(ModuleModel $module): ?string
+    public function renderIncludesForModule(ModuleModel $module): string|null
     {
-        $includes = array_merge($this->getModuleIncludes((int) $module->id), $this->getInsertTags('insert_module', (int) $module->id));
+        $includes = [...$this->getModuleIncludes((int) $module->id), ...$this->getInsertTags('insert_module', (int) $module->id)];
 
         return $this->renderIncludes(null, $includes, ModuleModel::getTable());
     }
 
-    public function renderIncludesForContentElement(ContentModel $element): ?string
+    public function renderIncludesForContentElement(ContentModel $element): string|null
     {
         // Get the type
         $type = $element->type;
@@ -94,22 +90,22 @@ final class IncludesAggregator
         return $this->renderIncludes($original, $includes, ContentModel::getTable());
     }
 
-    private function getContentElementIncludes(int $elementId, int $ignoreId = null): array
+    private function getContentElementIncludes(int $elementId, int|null $ignoreId = null): array
     {
-        return array_merge($this->getContentElements('cteAlias', 'alias', $elementId, $ignoreId), $this->getInsertTags('insert_content', $elementId));
+        return [...$this->getContentElements('cteAlias', 'alias', $elementId, $ignoreId), ...$this->getInsertTags('insert_content', $elementId)];
     }
 
-    private function getContentElement(int $contentElementId): ?array
+    private function getContentElement(int $contentElementId): array|null
     {
         // Get the content element
-        $element = ContentModel::findByPk($contentElementId);
+        $element = ContentModel::findById($contentElementId);
 
         if (null === $element || $element->ptable !== ArticleModel::getTable()) {
             return null;
         }
 
         // Get the parent
-        $article = ArticleModel::findByPk($element->pid);
+        $article = ArticleModel::findById($element->pid);
 
         if (null === $article) {
             return null;
@@ -138,15 +134,15 @@ final class IncludesAggregator
         ];
     }
 
-    private function getArticleIncludes(int $articleId, int $ignoreId = null): array
+    private function getArticleIncludes(int $articleId, int|null $ignoreId = null): array
     {
-        return array_merge($this->getContentElements('articleAlias', 'article', $articleId, $ignoreId), $this->getInsertTags('insert_article', $articleId));
+        return [...$this->getContentElements('articleAlias', 'article', $articleId, $ignoreId), ...$this->getInsertTags('insert_article', $articleId)];
     }
 
-    private function getArticle(int $articleId): ?array
+    private function getArticle(int $articleId): array|null
     {
         // Get the article
-        $article = ArticleModel::findByPk($articleId);
+        $article = ArticleModel::findById($articleId);
 
         if (null === $article) {
             return null;
@@ -174,10 +170,10 @@ final class IncludesAggregator
         ];
     }
 
-    private function getForm(int $formId): ?array
+    private function getForm(int $formId): array|null
     {
         // Get the form
-        $form = FormModel::findByPk($formId);
+        $form = FormModel::findById($formId);
 
         if (null === $form) {
             return null;
@@ -195,17 +191,17 @@ final class IncludesAggregator
         ];
     }
 
-    private function getModule(int $moduleId): ?array
+    private function getModule(int $moduleId): array|null
     {
         // Get the module
-        $module = ModuleModel::findByPk($moduleId);
+        $module = ModuleModel::findById($moduleId);
 
         if (null === $module) {
             return null;
         }
 
         // Get the theme
-        $theme = ThemeModel::findByPk((int) $module->pid);
+        $theme = ThemeModel::findById((int) $module->pid);
 
         if (null === $theme) {
             return null;
@@ -225,20 +221,20 @@ final class IncludesAggregator
         ];
     }
 
-    private function getFormIncludes(int $formId, int $ignoreId = null): array
+    private function getFormIncludes(int $formId, int|null $ignoreId = null): array
     {
         return $this->getContentElements('form', 'form', $formId, $ignoreId);
     }
 
-    private function getModuleIncludes(int $moduleId, int $ignoreId = null): array
+    private function getModuleIncludes(int $moduleId, int|null $ignoreId = null): array
     {
         $includes = $this->getContentElements('module', 'module', $moduleId, $ignoreId);
 
-        if (null === ($module = ModuleModel::findByPk($moduleId))) {
+        if (null === ($module = ModuleModel::findById($moduleId))) {
             return $includes;
         }
 
-        $theme = ThemeModel::findByPk((int) $module->pid);
+        $theme = ThemeModel::findById((int) $module->pid);
 
         if (null !== ($layouts = LayoutModel::findByPid($theme->id))) {
             foreach ($layouts as $layout) {
@@ -267,7 +263,7 @@ final class IncludesAggregator
         return $includes;
     }
 
-    private function getContentElements(string $idField, string $elementType, int $id, int $ignoreId = null): array
+    private function getContentElements(string $idField, string $elementType, int $id, int|null $ignoreId = null): array
     {
         // Prepare array
         $includes = [];
@@ -296,11 +292,15 @@ final class IncludesAggregator
 
     private function getInsertTags(string $insertTag, int $id): array
     {
+        if (!$this->enableIndex) {
+            return [];
+        }
+
         $includes = [];
 
         $insertTags = InsertTagIndexModel::findByTagParams($insertTag, (string) $id, ['limit' => 10]);
 
-        if (null === $insertTags) {
+        if (!$insertTags) {
             return $includes;
         }
 
@@ -325,9 +325,9 @@ final class IncludesAggregator
         return $includes;
     }
 
-    private function renderIncludes(?array $original, ?array $includes, string $class = null): ?string
+    private function renderIncludes(array|null $original, array|null $includes, string|null $class = null): string|null
     {
-        if (empty($includes) && empty($original)) {
+        if ((null === $includes || [] === $includes) && (null === $original || [] === $original)) {
             return null;
         }
 

@@ -24,16 +24,16 @@
         }
     ],
     "require": {
-        "php": ">=7.1",
-        "contao/core-bundle": "^4.9 || ^5.0",
-        "doctrine/dbal": "^2.11 || ^3.0",
+        "php": ">=8.1",
+        "contao/core-bundle": "^4.13 || ^5.0",
+        "doctrine/dbal": "^3.0",
         "nyholm/psr7": "^1.2",
-        "symfony/config": "^4.4 || ^5.2 || ^6.0",
-        "symfony/dependency-injection": "^4.4 || ^5.2 || ^6.0",
-        "symfony/event-dispatcher": "^4.4 || ^5.2 || ^6.0",
-        "symfony/http-foundation": "^4.4 || ^5.2 || ^6.0",
-        "symfony/http-kernel": "^4.4 || ^5.2 || ^6.0",
-        "symfony/routing": "^4.4 || ^5.2 || ^6.0"
+        "symfony/config": "^5.4 || ^6.4 || ^7.1",
+        "symfony/dependency-injection": "^5.4 || ^6.4 || ^7.1",
+        "symfony/event-dispatcher": "^5.4 || ^6.4 || ^7.1",
+        "symfony/http-foundation": "^5.4 || ^6.4 || ^7.1",
+        "symfony/http-kernel": "^5.4 || ^6.4 || ^7.1",
+        "symfony/routing": "^5.4 || ^6.4 || ^7.1"
     },
     "autoload": {
         "psr-4": {
@@ -44,6 +44,14 @@
         "contao-manager-plugin": "InspiredMinds\\IncludeInfoBundle\\ContaoManager\\Plugin"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.16"
+        "contao/easy-coding-standard": "^6.0",
+        "contao/rector": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": true,
+            "php-http/discovery": false,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

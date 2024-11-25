@@ -34,21 +34,14 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         'insert_form',
     ];
 
-    private $scopeMatcher;
-    private $framework;
-    private $db;
-    private $insertTagListener;
-    private $insertTagParser;
-    private $enableInsertTagIndex;
-
-    public function __construct(ScopeMatcher $scopeMatcher, ContaoFramework $framework, Connection $db, ReplaceInsertTagsListener $insertTagListener, ?InsertTagParser $insertTagParser, bool $enableInsertTagIndex)
-    {
-        $this->scopeMatcher = $scopeMatcher;
-        $this->framework = $framework;
-        $this->db = $db;
-        $this->insertTagListener = $insertTagListener;
-        $this->insertTagParser = $insertTagParser;
-        $this->enableInsertTagIndex = $enableInsertTagIndex;
+    public function __construct(
+        private readonly ScopeMatcher $scopeMatcher,
+        private readonly ContaoFramework $framework,
+        private readonly Connection $db,
+        private readonly ReplaceInsertTagsListener $insertTagListener,
+        private readonly InsertTagParser|null $insertTagParser,
+        private readonly bool $enableInsertTagIndex,
+    ) {
     }
 
     public static function getSubscribedEvents()
@@ -102,7 +95,7 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         // Get the cached insert tags from the insert tag listener
         $insertTags = new InsertTags();
 
-        if (null !== $this->insertTagParser) {
+        if ($this->insertTagParser) {
             $this->insertTagParser->replace('{{'.ReplaceInsertTagsListener::INDEX_INSERT_TAG.'}}');
         } else {
             (new InsertTags())->replace('{{'.ReplaceInsertTagsListener::INDEX_INSERT_TAG.'}}');
@@ -116,7 +109,7 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         $indexIds = [];
 
         foreach ($insertTags as $insertTag) {
-            $flags = explode('|', $insertTag);
+            $flags = explode('|', (string) $insertTag);
             $tag = array_shift($flags);
             $elements = explode('::', $tag);
             $tag = $elements[0];
@@ -131,7 +124,7 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
 
             $indexModel = InsertTagIndexModel::findOneByUrlTagParamsFlags($url, $tag, $params, $flags);
 
-            if (null === $indexModel) {
+            if (!$indexModel) {
                 $indexModel = new InsertTagIndexModel();
                 $indexModel->setRow([
                     'pid' => $pid,
@@ -150,7 +143,7 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         }
 
         // Delete all other indexed insert tags for this URL that have not been processed in the current request
-        if (!empty($indexIds)) {
+        if ([] !== $indexIds) {
             $this->db->executeStatement('DELETE FROM tl_inserttag_index WHERE `url` = ? AND `id` NOT IN ('.implode(',', $indexIds).')', [$url]);
         } else {
             $this->db->executeStatement('DELETE FROM tl_inserttag_index WHERE `url` = ?', [$url]);

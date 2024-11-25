@@ -5,7 +5,17 @@ declare(strict_types=1);
 /*
  * This file is part of the IncludeInfoBundle.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
+ *
+ * @license LGPL-3.0-or-later
+ */
+
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+
+/*
+ * This file is part of the IncludeInfoBundle.
+ *
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -33,16 +43,16 @@ $GLOBALS['TL_DCA']['tl_inserttag_index'] = [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'url' => [
-            'sql' => ['type' => 'string', 'length' => 2048, 'default' => '', 'customSchemaOptions' => ['collation' => 'ascii_bin']],
+            'sql' => ['type' => 'text', 'length' => MySQLPlatform::LENGTH_LIMIT_TEXT, 'notnull' => false],
         ],
         'tag' => [
-            'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+            'sql' => ['type' => 'string', 'length' => 200, 'default' => ''],
         ],
         'params' => [
-            'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+            'sql' => ['type' => 'string', 'length' => 200, 'default' => ''],
         ],
         'flags' => [
-            'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+            'sql' => ['type' => 'string', 'length' => 200, 'default' => ''],
         ],
     ],
 ];
