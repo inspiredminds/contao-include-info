@@ -29,7 +29,7 @@ class IndexColumnLengthMigration extends AbstractMigration
     private static array $columns = ['tag', 'params', 'flags'];
 
     public function __construct(
-        private readonly Connection $connection,
+        private readonly Connection $db,
         private readonly ContaoFramework $framework,
         private readonly bool $enableIndex,
     ) {
@@ -41,9 +41,14 @@ class IndexColumnLengthMigration extends AbstractMigration
             return false;
         }
 
-        $schemaManager = $this->connection->createSchemaManager();
+        $schemaManager = $this->db->createSchemaManager();
 
         if (!$schemaManager->tablesExist([self::TABLE])) {
+            return false;
+        }
+
+        // Check if there are entries
+        if (!$this->db->fetchOne(\sprintf('SELECT TRUE FROM %s', $this->db->quoteIdentifier(self::TABLE)))) {
             return false;
         }
 
@@ -51,6 +56,7 @@ class IndexColumnLengthMigration extends AbstractMigration
         $this->framework->initialize();
         Controller::loadDataContainer(self::TABLE);
 
+        // Check if any of the columns needs to be migrated to the lower column length
         foreach ($columns as $column) {
             if ($this->needsMigration($column)) {
                 return true;
@@ -62,7 +68,8 @@ class IndexColumnLengthMigration extends AbstractMigration
 
     public function run(): MigrationResult
     {
-        $this->connection->executeStatement(\sprintf('TRUNCATE %s', self::TABLE));
+        // Truncate the entries so that there are no errors while reducing the column length
+        $this->db->executeStatement(\sprintf('TRUNCATE %s', $this->db->quoteIdentifier(self::TABLE)));
 
         return $this->createResult(true);
     }
