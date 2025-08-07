@@ -26,14 +26,14 @@
     "require": {
         "php": ">=8.1",
         "contao/core-bundle": "^4.13 || ^5.0",
-        "doctrine/dbal": "^3.0",
+        "doctrine/dbal": "^2.11 || ^3.0 || ^4.0",
         "nyholm/psr7": "^1.2",
-        "symfony/config": "^5.4 || ^6.4 || ^7.1",
-        "symfony/dependency-injection": "^5.4 || ^6.4 || ^7.1",
-        "symfony/event-dispatcher": "^5.4 || ^6.4 || ^7.1",
-        "symfony/http-foundation": "^5.4 || ^6.4 || ^7.1",
-        "symfony/http-kernel": "^5.4 || ^6.4 || ^7.1",
-        "symfony/routing": "^5.4 || ^6.4 || ^7.1"
+        "symfony/config": "^5.4 || ^6.4 || ^7.3",
+        "symfony/dependency-injection": "^5.4 || ^6.4 || ^7.3",
+        "symfony/event-dispatcher": "^5.4 || ^6.4 || ^7.3",
+        "symfony/http-foundation": "^5.4 || ^6.4 || ^7.3",
+        "symfony/http-kernel": "^5.4 || ^6.4 || ^7.3",
+        "symfony/routing": "^5.4 || ^6.4 || ^7.3"
     },
     "autoload": {
         "psr-4": {
@@ -45,13 +45,16 @@
     },
     "require-dev": {
         "contao/easy-coding-standard": "^6.0",
-        "contao/rector": "^1.0"
+        "contao/manager-plugin": "^2.12",
+        "contao/rector": "^1.0",
+        "maglnet/composer-require-checker": "^4.0"
     },
     "config": {
         "allow-plugins": {
             "contao-components/installer": true,
             "php-http/discovery": false,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "contao/manager-plugin": true
         }
     }
 }

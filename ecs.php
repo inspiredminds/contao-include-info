@@ -21,7 +21,7 @@ return ECSConfig::configure()
         ],
     ])
     ->withConfiguredRule(HeaderCommentFixer::class, [
-        'header' => "This file is part of the IncludeInfoBundle.\n\n(c) INSPIRED MINDS\n\n@license LGPL-3.0-or-later",
+        'header' => "(c) INSPIRED MINDS",
     ])
     ->withParallel()
     ->withSpacing(lineEnding: "\n")
