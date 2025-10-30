@@ -76,7 +76,7 @@ class KernelTerminateSubscriber implements EventSubscriberInterface
         $url = (string) (new Uri($url));
 
         // Discard any overly long URLs
-        if (strlen($url) > 2048) {
+        if (\strlen($url) > 2048) {
             return;
         }
 

@@ -17,6 +17,8 @@ use Contao\BackendTemplate;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\DataContainer;
+use Contao\DcaLoader;
 use Contao\FormModel;
 use Contao\FrontendTemplate;
 use Contao\LayoutModel;
@@ -24,6 +26,7 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\ThemeModel;
+use Doctrine\DBAL\Connection;
 use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
@@ -34,7 +37,7 @@ final class IncludesAggregator
         private readonly RouterInterface $router,
         private readonly RequestStack $requestStack,
         private readonly ContaoCsrfTokenManager $tokenManager,
-        private readonly string $tokenName,
+        private readonly Connection $db,
         private readonly bool $enableIndex,
     ) {
     }
@@ -76,7 +79,7 @@ final class IncludesAggregator
         } elseif ('article' === $type) {
             $original = $this->getArticle((int) $element->articleAlias);
             $includes = $this->getArticleIncludes((int) $element->articleAlias, (int) $element->id);
-        } elseif ('form' === $type) {
+        } elseif ('form' === $type || 'ajaxform' === $type) {
             $original = $this->getForm((int) $element->form);
             $includes = $this->getFormIncludes((int) $element->form, (int) $element->id);
         } elseif ('module' === $type) {
@@ -98,39 +101,20 @@ final class IncludesAggregator
     private function getContentElement(int $contentElementId): array|null
     {
         // Get the content element
-        $element = ContentModel::findById($contentElementId);
-
-        if (null === $element || $element->ptable !== ArticleModel::getTable()) {
+        if (!$element = ContentModel::findById($contentElementId)) {
             return null;
         }
 
-        // Get the parent
-        $article = ArticleModel::findById($element->pid);
-
-        if (null === $article) {
+        // Get the trail information
+        if (!$trail = array_reverse($this->getTrailInfo($element->row(), $element->getTable()))) {
             return null;
         }
-
-        // Get the parent pages
-        $pages = PageModel::findParentsById($article->pid);
-
-        if (null === $pages) {
-            return null;
-        }
-
-        // Get the page titles
-        $pageTitles = array_reverse($pages->fetchEach('title'));
 
         // create breadcrumb
         return [
-            'crumbs' => $pageTitles,
-            'title' => $article->title,
-            'link' => $this->router->generate('contao_backend', [
-                'do' => 'article',
-                'table' => 'tl_content',
-                'id' => $article->id,
-                'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-            ]),
+            'crumbs' => array_map(static fn (array $t) => $t['title'], \array_slice($trail, 0, \count($trail) - 1)),
+            'title' => $trail[\count($trail) - 1]['title'],
+            'link' => $this->getViewUrl($element->getTable(), $element->pid, $element->row()),
         ];
     }
 
@@ -142,16 +126,12 @@ final class IncludesAggregator
     private function getArticle(int $articleId): array|null
     {
         // Get the article
-        $article = ArticleModel::findById($articleId);
-
-        if (null === $article) {
+        if (!$article = ArticleModel::findById($articleId)) {
             return null;
         }
 
         // Get the parent pages
-        $pages = PageModel::findParentsById($article->pid);
-
-        if (null === $pages) {
+        if (!$pages = PageModel::findParentsById($article->pid)) {
             return null;
         }
 
@@ -173,9 +153,7 @@ final class IncludesAggregator
     private function getForm(int $formId): array|null
     {
         // Get the form
-        $form = FormModel::findById($formId);
-
-        if (null === $form) {
+        if (!$form = FormModel::findById($formId)) {
             return null;
         }
 
@@ -216,14 +194,14 @@ final class IncludesAggregator
                 'id' => $module->id,
                 'act' => 'edit',
                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                'rt' => $this->tokenManager->getToken($this->tokenName),
+                'rt' => $this->tokenManager->getDefaultTokenValue(),
             ]),
         ];
     }
 
     private function getFormIncludes(int $formId, int|null $ignoreId = null): array
     {
-        return $this->getContentElements('form', 'form', $formId, $ignoreId);
+        return [...$this->getContentElements('form', 'form', $formId, $ignoreId), ...$this->getContentElements('form', 'ajaxform', $formId, $ignoreId)];
     }
 
     private function getModuleIncludes(int $moduleId, int|null $ignoreId = null): array
@@ -251,7 +229,7 @@ final class IncludesAggregator
                                 'id' => $layout->id,
                                 'act' => 'edit',
                                 'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                                'rt' => $this->tokenManager->getToken($this->tokenName),
+                                'rt' => $this->tokenManager->getDefaultTokenValue(),
                             ]),
                         ];
                         break;
@@ -310,12 +288,12 @@ final class IncludesAggregator
                 'title' => '<code>'.$insertTag->getInsertTagString().'</code>',
             ];
 
-            if (!empty($insertTag->pid)) {
+            if ($insertTag->pid) {
                 $include['link'] = $this->router->generate('contao_backend', [
                     'do' => 'article',
                     'pn' => $insertTag->pid,
                     'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-                    'rt' => $this->tokenManager->getToken($this->tokenName),
+                    'rt' => $this->tokenManager->getDefaultTokenValue(),
                 ]);
             }
 
@@ -346,5 +324,110 @@ final class IncludesAggregator
 
         // Parse template
         return $template->parse();
+    }
+
+    private function getViewUrl(string $table, int $id, array $record): string|null
+    {
+        if (!$do = $this->findModuleFromTableId($record, $table)) {
+            return null;
+        }
+
+        $query = [
+            'do' => $do,
+            'id' => $id,
+            'table' => $table,
+            'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
+        ];
+
+        return $this->router->generate('contao_backend', $query);
+    }
+
+    private function findModuleFromTableId(array $record, string $table, array|null $filteredModules = null): string|null
+    {
+        $modules = [];
+
+        foreach (null === $filteredModules ? $GLOBALS['BE_MOD'] : [$filteredModules] as $group) {
+            foreach ($group as $do => $module) {
+                if (\in_array($table, $module['tables'] ?? [], true)) {
+                    $modules[$do] = $module;
+                }
+            }
+        }
+
+        if (1 === \count($modules)) {
+            return array_keys($modules)[0];
+        }
+
+        if (isset($record['ptable'], $record['pid']) && ($precord = $this->db->fetchAssociative("SELECT * FROM {$record['ptable']} WHERE id = ?", [$record['pid']]))) {
+            return $this->findModuleFromTableId($precord, $record['ptable'], $modules);
+        }
+
+        return array_keys($modules)[0] ?? null;
+    }
+
+    private function findParentFromRecord(array $record, string $table): array|null
+    {
+        (new DcaLoader($table))->load();
+
+        $pid = (int) ($record['pid'] ?? null);
+
+        if (!$pid) {
+            return null;
+        }
+
+        if (($record['ptable'] ?? null) && ($GLOBALS['TL_DCA'][$table]['config']['dynamicPtable'] ?? null)) {
+            $ptable = (string) $record['ptable'];
+        } else {
+            $ptable = $GLOBALS['TL_DCA'][$table]['config']['ptable'] ?? null;
+        }
+
+        if (!$ptable && DataContainer::MODE_TREE === $GLOBALS['TL_DCA'][$table]['list']['sorting']['mode']) {
+            $ptable = $table;
+        }
+
+        if (!$ptable) {
+            return null;
+        }
+
+        if (!$parentRecord = $this->db->fetchAssociative("SELECT * FROM {$ptable} WHERE id = ?", [$pid])) {
+            return null;
+        }
+
+        return [
+            'record' => $parentRecord,
+            'table' => $ptable,
+            'title' => $this->getTitle($parentRecord, $ptable),
+        ];
+    }
+
+    private function getTrailInfo(array $record, string $table): array
+    {
+        $trail = [];
+
+        while ($parent = $this->findParentFromRecord($record, $table)) {
+            if ((int) $parent['record']['id'] === (int) $record['id']) {
+                break;
+            }
+
+            $trail[] = $parent;
+
+            $table = $parent['table'];
+            $record = $parent['record'];
+        }
+
+        return $trail;
+    }
+
+    private function getTitle(array $record, string $table): string
+    {
+        (new DcaLoader($table))->load();
+
+        $defaultSearchField = $GLOBALS['TL_DCA'][$table]['list']['sorting']['defaultSearchField'] ?? null;
+
+        if ($defaultSearchField && ($label = $record[$defaultSearchField] ?? null)) {
+            return trim(StringUtil::decodeEntities(strip_tags((string) $label)));
+        }
+
+        return $record['title'] ?? $record['name'] ?? $record['headline'] ?? null ?: $table.'.'.$record['id'];
     }
 }

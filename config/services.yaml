@@ -9,7 +9,7 @@ services:
       - '@router'
       - '@request_stack'
       - '@contao.csrf.token_manager'
-      - '%contao.csrf_token_name%'
+      - '@database_connection'
       - '%contao_include_info.enable_insert_tag_index%'
 
   InspiredMinds\IncludeInfoBundle\EventListener\HeaderCallbackListener:
