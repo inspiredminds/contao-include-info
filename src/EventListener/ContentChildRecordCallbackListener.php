@@ -22,10 +22,6 @@ class ContentChildRecordCallbackListener
         // Render child record
         $childRecord = (new \tl_content())->addCteType($row);
 
-        if ('tl_article' !== $row['ptable']) {
-            return $childRecord;
-        }
-
         // Get the content element
         $element = ContentModel::findById((int) $row['id']);
 
