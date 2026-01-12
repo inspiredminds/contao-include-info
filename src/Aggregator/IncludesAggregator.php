@@ -336,6 +336,7 @@ final class IncludesAggregator
             'do' => $do,
             'id' => $id,
             'table' => $table,
+            'ptable' => $record['ptable'] ?? null,
             'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
         ];
 
