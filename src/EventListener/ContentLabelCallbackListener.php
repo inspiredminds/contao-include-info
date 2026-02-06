@@ -28,13 +28,9 @@ readonly class ContentLabelCallbackListener
         // Render the include info for the content element
         $includeInfo = $this->aggregator->renderIncludesForContentElement($element);
 
-        dump($includeInfo);
-
         if ($includeInfo) {
             $label[1] = $includeInfo.$label[1] ?? '';
         }
-
-        dump($label);
 
         return $label;
     }
