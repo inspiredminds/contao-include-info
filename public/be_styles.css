@@ -86,10 +86,7 @@
     .tl_includes {
         font-size: 0.8rem;
         padding: 10px;
-        margin: -10px -10px 10px;
-        order: 3;
-        background-color: var(--table-header);
-        border-bottom: 1px solid var(--border);
+        margin-bottom: 10px;
         border-left: 0;
 
         table {
@@ -100,5 +97,13 @@
                 display: inline-block;
             }
         }
+    }
+}
+
+[data-contao--limit-height-target] {
+    .tl_includes {
+        margin: -10px -10px 10px;
+        background-color: var(--table-header);
+        border-bottom: 1px solid var(--border);
     }
 }
