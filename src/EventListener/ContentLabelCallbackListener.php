@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace InspiredMinds\IncludeInfoBundle\EventListener;
 
 use Contao\ContentModel;
-use Contao\DataContainer;
 use InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator;
 
 readonly class ContentLabelCallbackListener
@@ -32,7 +31,7 @@ readonly class ContentLabelCallbackListener
         dump($includeInfo);
 
         if ($includeInfo) {
-            $label[1] = $includeInfo . $label[1] ?? '';
+            $label[1] = $includeInfo.$label[1] ?? '';
         }
 
         dump($label);
