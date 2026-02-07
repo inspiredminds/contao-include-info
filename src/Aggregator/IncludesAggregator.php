@@ -30,6 +30,7 @@ use Doctrine\DBAL\Connection;
 use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class IncludesAggregator
 {
@@ -38,6 +39,7 @@ final class IncludesAggregator
         private readonly RequestStack $requestStack,
         private readonly ContaoCsrfTokenManager $tokenManager,
         private readonly Connection $db,
+        private readonly TranslatorInterface $translator,
         private readonly bool $enableIndex,
     ) {
     }
@@ -429,6 +431,31 @@ final class IncludesAggregator
             return trim(StringUtil::decodeEntities(strip_tags((string) $label)));
         }
 
-        return $record['title'] ?? $record['name'] ?? $record['headline'] ?? null ?: $table.'.'.$record['id'];
+        foreach (['title', 'name', 'headline'] as $field) {
+            $value = $record[$field] ?? null;
+
+            if (!$value) {
+                continue;
+            }
+
+            if ('headline' === $field) {
+                $headline = StringUtil::deserialize($value, true);
+                $value = $headline['value'] ?? null;
+
+                if ($value) {
+                    return $value;
+                }
+
+                continue;
+            }
+
+            return $value;
+        }
+
+        return match ($table) {
+            'tl_content' => $this->translator->trans(\sprintf('CTE.%s.0', $record['type']), [], 'contao_default'),
+            'tl_module' => $this->translator->trans(\sprintf('FMD.%s.0', $record['type']), [], 'contao_modules'),
+            default => $table.'.'.$record['id'],
+        };
     }
 }
