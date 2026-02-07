@@ -95,6 +95,7 @@
             th, td {
                 all: unset;
                 display: inline-block;
+                vertical-align: text-top;
             }
         }
     }
