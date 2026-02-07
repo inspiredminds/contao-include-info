@@ -17,7 +17,7 @@ services:
     arguments:
       - '@InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator'
 
-  InspiredMinds\IncludeInfoBundle\EventListener\ContentChildRecordCallbackListener:
+  InspiredMinds\IncludeInfoBundle\EventListener\ContentLabelCallbackListener:
     public: true
     arguments:
       - '@InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator'

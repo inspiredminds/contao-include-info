@@ -76,20 +76,34 @@
     display: none;
 }
 
-/* Contao 5.3+ adjustments */
-[data-contao--limit-height-target] .tl_includes {
-    font-size: 0.8rem;
-    padding: 8px 10px;
-    grid-column: 1 / -1;
-    margin: 0;
-    order: 3;
-    background-color: var(--table-header);
-    border-top: 1px solid var(--border);
-    border-left: 0;
-}
-
-.tl_content:hover [data-contao--limit-height-target] .tl_includes {
+.tl_content:hover .cte_preview .tl_includes {
     border-left: 0;
     color: inherit;
     background-color: var(--table-header);
+}
+
+.cte_preview {
+    .tl_includes {
+        font-size: 0.8rem;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-left: 0;
+
+        table {
+            margin-bottom: 0;
+
+            th, td {
+                all: unset;
+                display: inline-block;
+            }
+        }
+    }
+}
+
+[data-contao--limit-height-target] {
+    .tl_includes {
+        margin: -10px -10px 10px;
+        background-color: var(--table-header);
+        border-bottom: 1px solid var(--border);
+    }
 }
