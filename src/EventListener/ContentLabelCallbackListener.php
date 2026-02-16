@@ -9,18 +9,27 @@ declare(strict_types=1);
 namespace InspiredMinds\IncludeInfoBundle\EventListener;
 
 use Contao\ContentModel;
+use Contao\CoreBundle\EventListener\DataContainer\ContentElementViewListener;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\DataContainer;
 use InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class ContentLabelCallbackListener
+class ContentLabelCallbackListener extends ContentElementViewListener
 {
-    public function __construct(private IncludesAggregator $aggregator)
-    {
+    public function __construct(
+        private readonly IncludesAggregator $aggregator,
+        private readonly ContentElementViewListener $inner,
+        ContaoFramework $framework,
+        TranslatorInterface $translator,
+    ) {
+        parent::__construct($framework, $translator);
     }
 
-    public function onLabelCallback(array $row): array
+    public function generateLabel(array $row, string $label, DataContainer $dc): array
     {
         // Render label
-        $label = (new \tl_content())->addCteType($row);
+        $label = $this->inner->generateLabel($row, $label, $dc);
 
         // Get the content element
         $element = ContentModel::findById((int) $row['id']);

@@ -19,9 +19,8 @@ services:
       - '@InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator'
 
   InspiredMinds\IncludeInfoBundle\EventListener\ContentLabelCallbackListener:
-    public: true
-    arguments:
-      - '@InspiredMinds\IncludeInfoBundle\Aggregator\IncludesAggregator'
+    decorates: contao.listener.data_container.content_element_view
+    autowire: true
 
   InspiredMinds\IncludeInfoBundle\EventListener\DisableInsertTagIndexListener:
     arguments:
