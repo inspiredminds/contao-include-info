@@ -26,7 +26,7 @@ class ContentLabelCallbackListener extends ContentElementViewListener
         parent::__construct($framework, $translator);
     }
 
-    public function generateLabel(array $row, string $label, DataContainer $dc): array
+    public function generateLabel(array $row, string $label, DataContainer $dc): array|string
     {
         // Render label
         $label = $this->inner->generateLabel($row, $label, $dc);
@@ -38,7 +38,11 @@ class ContentLabelCallbackListener extends ContentElementViewListener
         $includeInfo = $this->aggregator->renderIncludesForContentElement($element);
 
         if ($includeInfo) {
-            $label[1] = $includeInfo.$label[1] ?? '';
+            if (\is_array($label)) {
+                $label[1] = $includeInfo.($label[1] ?? '');
+            } else {
+                $label = $includeInfo.$label;
+            }
         }
 
         return $label;
