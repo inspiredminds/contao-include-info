@@ -31,6 +31,7 @@ use InspiredMinds\IncludeInfoBundle\Model\InsertTagIndexModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 final class IncludesAggregator
 {
@@ -40,6 +41,7 @@ final class IncludesAggregator
         private readonly ContaoCsrfTokenManager $tokenManager,
         private readonly Connection $db,
         private readonly TranslatorInterface $translator,
+        private readonly Environment $twig,
         private readonly bool $enableIndex,
     ) {
     }
@@ -318,14 +320,13 @@ final class IncludesAggregator
             $GLOBALS['TL_MOOTOOLS'][self::class] = FrontendTemplate::generateScriptTag('bundles/includeinfo/be_javascript.js');
         }
 
-        // Prepare the template
-        $template = new BackendTemplate('be_includes');
-        $template->original = $original;
-        $template->includes = $includes;
-        $template->class = $class;
-
-        // Parse template
-        return $template->parse();
+        // Render the template
+        return $this->twig->render('@Contao/be_includes.html.twig', [
+            'original' => $original,
+            'includes' => $includes,
+            'class' => $class,
+            'do_not_collapse' => (bool) Config::get('doNotCollapse'),
+        ]);
     }
 
     private function getViewUrl(string $table, int $id, array $record): string|null
