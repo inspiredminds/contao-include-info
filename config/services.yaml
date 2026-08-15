@@ -11,6 +11,7 @@ services:
       - '@contao.csrf.token_manager'
       - '@database_connection'
       - '@translator'
+      - '@twig'
       - '%contao_include_info.enable_insert_tag_index%'
 
   InspiredMinds\IncludeInfoBundle\EventListener\HeaderCallbackListener:

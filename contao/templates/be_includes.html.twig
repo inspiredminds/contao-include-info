@@ -1,0 +1,37 @@
+{% trans_default_domain 'contao_default' %}
+
+{% if original or includes %}
+    {% set wrapper_attributes = attrs()
+        .addClass('tl_includes')
+        .addClass("tl_includes-#{class}", class|default)
+    %}
+    <div{{ wrapper_attributes }}>
+        <table>
+            <tbody>
+            {% if original %}
+                <tr>
+                    <th class="original_label">{{ 'MSC.inc_originalLabel'|trans }}</th>
+                    <td class="original">{% if original.crumbs %}{{ original.crumbs|join(' » ') }} › {% endif %}<a href="{{ original.link }}">{{ original.title }}</a></td>
+                </tr>
+            {% endif %}
+            <tr>
+                {% if includes %}
+                    {% set cell_attributes = attrs()
+                        .addClass('includes')
+                        .addClass('includes--multiple', includes|length > 1)
+                        .addClass('includes--limit-height', includes|length > 1 and not do_not_collapse)
+                    %}
+                    <th class="includes_label">{{ 'MSC.inc_includesLabel'|trans }}</th>
+                    <td{{ cell_attributes }}>
+                        <ul>
+                            {% for inc in includes %}
+                                <li>{% if inc.crumbs %}{{ inc.crumbs|join(' » ') }} › {% endif %}<a href="{{ inc.link }}">{{ inc.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                {% endif %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endif %}
