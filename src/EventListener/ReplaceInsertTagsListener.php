@@ -8,11 +8,9 @@ declare(strict_types=1);
 
 namespace InspiredMinds\IncludeInfoBundle\EventListener;
 
-use Contao\CoreBundle\ServiceAnnotation\Hook;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 
-/**
- * @Hook("replaceInsertTags")
- */
+#[AsHook('replaceInsertTags')]
 class ReplaceInsertTagsListener
 {
     public const INDEX_INSERT_TAG = 'include_info_index';
